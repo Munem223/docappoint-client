@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
+const API_URL = 'https://docappoint-server-pfb3.onrender.com';
+
 const DoctorDetails = () => {
   const { id } = useParams();
   const [doctor, setDoctor] = useState(null);
@@ -12,7 +14,6 @@ const DoctorDetails = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Booking form state
   const [formData, setFormData] = useState({
     patientName: '',
     gender: 'Male',
@@ -22,7 +23,7 @@ const DoctorDetails = () => {
   });
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/api/doctors/${id}`)
+    axios.get(`${API_URL}/api/doctors/${id}`)
       .then(res => {
         setDoctor(res.data);
         setLoading(false);
@@ -45,7 +46,7 @@ const DoctorDetails = () => {
   const handleSubmitBooking = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('${import.meta.env.VITE_API_URL}/api/appointments', {
+      await axios.post(`${API_URL}/api/appointments`, {
         ...formData,
         doctorName: doctor.name
       }, {
@@ -54,10 +55,9 @@ const DoctorDetails = () => {
 
       toast.success('Appointment booked successfully!');
       setShowModal(false);
-      // Reset form
       setFormData({ patientName: '', gender: 'Male', phone: '', appointmentDate: '', appointmentTime: '' });
     } catch (error) {
-      toast.error('Failed to book appointment');
+      toast.error(error.response?.data?.message || 'Failed to book appointment');
     }
   };
 
@@ -67,16 +67,11 @@ const DoctorDetails = () => {
   return (
     <div className="max-w-6xl mx-auto px-6 py-12">
       <div className="grid md:grid-cols-2 gap-12">
-        {/* Left - Image & Info */}
         <div>
-          <img 
-            src={doctor.image} 
-            alt={doctor.name} 
-            className="w-full rounded-3xl shadow-2xl"
-          />
+          <img src={doctor.image} alt={doctor.name} className="w-full rounded-3xl shadow-2xl" />
           <div className="mt-8 bg-white p-6 rounded-3xl shadow">
             <h3 className="text-xl font-semibold mb-4">Availability</h3>
-            {doctor.availability.map((time, index) => (
+            {doctor.availability && doctor.availability.map((time, index) => (
               <p key={index} className="bg-gray-100 px-4 py-2 rounded-2xl inline-block mr-3 mb-3">
                 {time}
               </p>
@@ -84,7 +79,6 @@ const DoctorDetails = () => {
           </div>
         </div>
 
-        {/* Right - Details */}
         <div>
           <h1 className="text-5xl font-bold">{doctor.name}</h1>
           <p className="text-2xl text-blue-600 mt-2">{doctor.specialty}</p>
@@ -120,7 +114,7 @@ const DoctorDetails = () => {
         </div>
       </div>
 
-      {/* BOOKING MODAL */}
+      {/* Booking Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl max-w-lg w-full mx-4 overflow-hidden">
@@ -145,7 +139,7 @@ const DoctorDetails = () => {
                     <select
                       value={formData.gender}
                       onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                      className="w-full px-5 py-4 border rounded-2xl focus:outline-none focus:border-blue-500"
+                      className="w-full px-5 py-4 border rounded-2xl"
                     >
                       <option>Male</option>
                       <option>Female</option>
@@ -178,10 +172,10 @@ const DoctorDetails = () => {
                     <label className="block text-sm font-medium mb-2">Time</label>
                     <input
                       type="text"
-                      placeholder="10:30 AM"
                       value={formData.appointmentTime}
                       onChange={(e) => setFormData({...formData, appointmentTime: e.target.value})}
                       className="w-full px-5 py-4 border rounded-2xl focus:outline-none focus:border-blue-500"
+                      placeholder="10:30 AM"
                       required
                     />
                   </div>

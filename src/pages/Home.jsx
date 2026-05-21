@@ -18,13 +18,15 @@ const Home = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL;
-        console.log("Fetching doctors from:", apiUrl);   // for debugging
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://docappoint-server-pfb3.onrender.com';
+        console.log("🔥 Fetching from:", apiUrl);
+
         const res = await axios.get(`${apiUrl}/api/doctors`);
-        console.log("Doctors received:", res.data);
+        console.log("✅ Doctors received:", res.data);
+
         setDoctors(res.data.slice(0, 3));
       } catch (err) {
-        console.error("Failed to fetch doctors:", err);
+        console.error("❌ Failed to fetch doctors:", err.response?.data || err.message);
       } finally {
         setLoading(false);
       }
@@ -64,9 +66,11 @@ const Home = () => {
 
         {loading ? (
           <p className="text-center text-xl">Loading doctors...</p>
+        ) : doctors.length === 0 ? (
+          <p className="text-center text-xl text-red-500">Failed to load doctors. Please try again later.</p>
         ) : (
           <div className="grid md:grid-cols-3 gap-8">
-            {(doctors || []).map((doctor) => (
+            {doctors.map((doctor) => (
               <div key={doctor._id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all">
                 <img 
                   src={doctor.image || "https://picsum.photos/id/1005/800/600"} 

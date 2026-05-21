@@ -1,42 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 import { Star } from 'lucide-react';
 
 const Home = () => {
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Temporary demo doctors so page doesn't crash
-  const doctors = [
-    {
-      _id: "1",
-      name: "Dr. Ayesha Rahman",
-      specialty: "Cardiologist",
-      image: "https://picsum.photos/id/1005/800/600",
-      description: "Highly experienced cardiologist...",
-      fee: 800,
-      rating: 4.9
-    },
-    {
-      _id: "2",
-      name: "Dr. Rakib Hassan",
-      specialty: "Neurologist",
-      image: "https://picsum.photos/id/1011/800/600",
-      description: "Expert in brain and nervous system...",
-      fee: 700,
-      rating: 4.7
-    },
-    {
-      _id: "3",
-      name: "Dr. Nusrat Jahan",
-      specialty: "Gynecologist",
-      image: "https://picsum.photos/id/1009/800/600",
-      description: "Compassionate women's health care...",
-      fee: 600,
-      rating: 4.8
-    }
-  ];
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const apiUrl = 'https://docappoint-server-pfb3.onrender.com';
+        console.log("Fetching doctors from:", apiUrl);
+
+        const res = await axios.get(`${apiUrl}/api/doctors`);
+        console.log("Doctors received:", res.data);
+
+        setDoctors(res.data.slice(0, 3));
+      } catch (err) {
+        console.error("Failed to fetch doctors:", err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
 
   const handleViewDetails = (doctorId) => {
     if (user) {
@@ -53,10 +45,7 @@ const Home = () => {
         <div className="max-w-4xl mx-auto text-center px-6">
           <h1 className="text-6xl font-bold mb-6">Book Your Doctor Appointment</h1>
           <p className="text-2xl mb-10">Instant, Secure & Hassle-Free Booking</p>
-          <Link 
-            to="/all-appointments" 
-            className="bg-white text-blue-700 px-10 py-4 rounded-2xl text-xl font-semibold hover:bg-gray-100 transition"
-          >
+          <Link to="/all-appointments" className="bg-white text-blue-700 px-10 py-4 rounded-2xl text-xl font-semibold hover:bg-gray-100">
             Browse Doctors
           </Link>
         </div>
@@ -67,38 +56,42 @@ const Home = () => {
         <h2 className="text-4xl font-bold text-center mb-4">Top Rated Doctors</h2>
         <p className="text-center text-gray-600 mb-12">Highly recommended by our patients</p>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {doctors.map((doctor) => (
-            <div key={doctor._id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all">
-              <img src={doctor.image} alt={doctor.name} className="w-full h-64 object-cover" />
-              <div className="p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-2xl font-semibold">{doctor.name}</h3>
-                    <p className="text-blue-600">{doctor.specialty}</p>
+        {loading ? (
+          <p className="text-center text-xl">Loading doctors...</p>
+        ) : (
+          <div className="grid md:grid-cols-3 gap-8">
+            {doctors.map((doctor) => (
+              <div key={doctor._id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all">
+                <img src={doctor.image} alt={doctor.name} className="w-full h-64 object-cover" />
+                <div className="p-6">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="text-2xl font-semibold">{doctor.name}</h3>
+                      <p className="text-blue-600">{doctor.specialty}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-yellow-500">
+                      <Star size={20} fill="currentColor" />
+                      <span className="font-bold">{doctor.rating}</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1 text-yellow-500">
-                    <Star size={20} fill="currentColor" />
-                    <span className="font-bold">{doctor.rating}</span>
+                  <p className="text-gray-600 mt-4 line-clamp-3">{doctor.description}</p>
+                  <div className="mt-6 flex justify-between items-center">
+                    <div>
+                      <span className="text-sm text-gray-500">Fee</span>
+                      <p className="text-2xl font-bold text-green-600">৳{doctor.fee}</p>
+                    </div>
+                    <button
+                      onClick={() => handleViewDetails(doctor._id)}
+                      className="bg-blue-600 text-white px-8 py-3 rounded-2xl hover:bg-blue-700 transition"
+                    >
+                      View Details
+                    </button>
                   </div>
-                </div>
-                <p className="text-gray-600 mt-4 line-clamp-3">{doctor.description}</p>
-                <div className="mt-6 flex justify-between items-center">
-                  <div>
-                    <span className="text-sm text-gray-500">Fee</span>
-                    <p className="text-2xl font-bold text-green-600">৳{doctor.fee}</p>
-                  </div>
-                  <button
-                    onClick={() => handleViewDetails(doctor._id)}
-                    className="bg-blue-600 text-white px-8 py-3 rounded-2xl hover:bg-blue-700 transition"
-                  >
-                    View Details
-                  </button>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -81,7 +81,7 @@ const Home = () => {
           <p className="text-center">Loading doctors...</p>
         ) : (
           <div className="grid md:grid-cols-3 gap-8">
-            {doctors.map(doctor => (
+            {(doctors || []).map(doctor => (
               <div key={doctor._id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition">
                 <img src={doctor.image} alt={doctor.name} className="w-full h-64 object-cover" />
                 <div className="p-6">

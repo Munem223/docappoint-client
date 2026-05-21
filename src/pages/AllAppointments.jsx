@@ -1,24 +1,42 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 import { Search } from 'lucide-react';
 
 const AllAppointments = () => {
+  const [doctors, setDoctors] = useState([]);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Temporary demo doctors so page doesn't crash
-  const doctors = [
-    { _id: "1", name: "Dr. Ayesha Rahman", specialty: "Cardiologist", image: "https://picsum.photos/id/1005/800/600", fee: 800 },
-    { _id: "2", name: "Dr. Rakib Hassan", specialty: "Neurologist", image: "https://picsum.photos/id/1011/800/600", fee: 700 },
-    { _id: "3", name: "Dr. Nusrat Jahan", specialty: "Gynecologist", image: "https://picsum.photos/id/1009/800/600", fee: 600 },
-  ];
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const apiUrl = 'https://docappoint-server-pfb3.onrender.com';
+        const res = await axios.get(`${apiUrl}/api/doctors`);
+        setDoctors(res.data);
+        setFilteredDoctors(res.data);
+      } catch (err) {
+        console.error("Failed to fetch doctors", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredDoctors = doctors.filter(doctor =>
-    doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+    fetchDoctors();
+  }, []);
+
+  // Search
+  useEffect(() => {
+    const filtered = doctors.filter(doctor =>
+      doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      doctor.specialty.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredDoctors(filtered);
+  }, [searchTerm, doctors]);
 
   const handleViewDetails = (doctorId) => {
     if (user) {
@@ -27,6 +45,8 @@ const AllAppointments = () => {
       navigate('/login');
     }
   };
+
+  if (loading) return <p className="text-center text-xl py-20">Loading doctors...</p>;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">

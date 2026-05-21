@@ -24,7 +24,7 @@ const Dashboard = () => {
 
   const fetchBookings = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/appointments', {
+      const { data } = await axios.get('${import.meta.env.VITE_API_URL}/api/appointments', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setBookings(data);
@@ -38,7 +38,7 @@ const Dashboard = () => {
   const deleteBooking = async (id) => {
     if (!window.confirm('Delete this appointment?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/appointments/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/appointments/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       toast.success('Appointment deleted successfully!');
@@ -51,7 +51,7 @@ const Dashboard = () => {
   const updateBooking = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/appointments/${editingBooking._id}`, editingBooking, {
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/appointments/${editingBooking._id}`, editingBooking, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       toast.success('Appointment updated successfully!');

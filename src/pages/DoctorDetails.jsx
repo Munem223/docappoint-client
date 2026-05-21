@@ -22,7 +22,7 @@ const DoctorDetails = () => {
   });
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/doctors/${id}`)
+    axios.get(`${import.meta.env.VITE_API_URL}/api/doctors/${id}`)
       .then(res => {
         setDoctor(res.data);
         setLoading(false);
@@ -45,7 +45,7 @@ const DoctorDetails = () => {
   const handleSubmitBooking = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/appointments', {
+      await axios.post('${import.meta.env.VITE_API_URL}/api/appointments', {
         ...formData,
         doctorName: doctor.name
       }, {

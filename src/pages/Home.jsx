@@ -16,7 +16,7 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/doctors')
+    axios.get('${import.meta.env.VITE_API_URL}/api/doctors')
       .then(res => {
         setDoctors(res.data.slice(0, 3)); // Only top 3
         setLoading(false);

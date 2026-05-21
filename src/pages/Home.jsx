@@ -15,18 +15,17 @@ const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const API_URL = import.meta.env.VITE_API_URL || 'https://docappoint-server-pfb3.onrender.com';
+
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://docappoint-server-pfb3.onrender.com';
-        console.log("🔥 Fetching from:", apiUrl);
-
-        const res = await axios.get(`${apiUrl}/api/doctors`);
-        console.log("✅ Doctors received:", res.data);
-
+        console.log("Fetching doctors from:", API_URL);
+        const res = await axios.get(`${API_URL}/api/doctors`);
+        console.log("Doctors received:", res.data);
         setDoctors(res.data.slice(0, 3));
       } catch (err) {
-        console.error("❌ Failed to fetch doctors:", err.response?.data || err.message);
+        console.error("Failed to fetch doctors:", err.message);
       } finally {
         setLoading(false);
       }
@@ -50,10 +49,7 @@ const Home = () => {
         <div className="max-w-4xl mx-auto text-center px-6">
           <h1 className="text-6xl font-bold mb-6">Book Your Doctor Appointment</h1>
           <p className="text-2xl mb-10">Instant, Secure & Hassle-Free Booking</p>
-          <Link 
-            to="/all-appointments" 
-            className="bg-white text-blue-700 px-10 py-4 rounded-2xl text-xl font-semibold hover:bg-gray-100 transition"
-          >
+          <Link to="/all-appointments" className="bg-white text-blue-700 px-10 py-4 rounded-2xl text-xl font-semibold hover:bg-gray-100">
             Browse Doctors
           </Link>
         </div>
@@ -66,17 +62,11 @@ const Home = () => {
 
         {loading ? (
           <p className="text-center text-xl">Loading doctors...</p>
-        ) : doctors.length === 0 ? (
-          <p className="text-center text-xl text-red-500">Failed to load doctors. Please try again later.</p>
         ) : (
           <div className="grid md:grid-cols-3 gap-8">
             {doctors.map((doctor) => (
               <div key={doctor._id} className="bg-white rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all">
-                <img 
-                  src={doctor.image || "https://picsum.photos/id/1005/800/600"} 
-                  alt={doctor.name} 
-                  className="w-full h-64 object-cover"
-                />
+                <img src={doctor.image} alt={doctor.name} className="w-full h-64 object-cover" />
                 <div className="p-6">
                   <div className="flex justify-between items-start">
                     <div>

@@ -1,101 +1,92 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FcGoogle } from 'react-icons/fc';
-import toast from 'react-hot-toast';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [photoURL, setPhotoURL] = useState('');
-  const [error, setError] = useState('');
-  const { register, loginWithGoogle } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const validatePassword = (pass) => {
-    const hasUpper = /[A-Z]/.test(pass);
-    const hasLower = /[a-z]/.test(pass);
-    return hasUpper && hasLower && pass.length >= 6;
-  };
-
-  const handleEmailRegister = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-
-    if (!validatePassword(password)) {
-      setError('Password must contain at least one uppercase, one lowercase letter and be at least 6 characters long.');
-      toast.error('Invalid password');
-      return;
-    }
-
+    setLoading(true);
     const success = await register(name, email, password, photoURL);
-    if (success) navigate('/login');
-  };
-
-  const handleGoogleLogin = async () => {
-    const success = await loginWithGoogle();
-    if (success) navigate('/');
+    if (success) {
+      navigate('/login');
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 bg-white p-10 rounded-3xl shadow">
-      <h2 className="text-4xl font-bold text-center mb-8">Register</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8">
+        <h2 className="text-3xl font-bold text-center mb-8">Create Account</h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium mb-2">Full Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-blue-500"
+              required
+            />
+          </div>
 
-      <form onSubmit={handleEmailRegister} className="space-y-6">
-        <input 
-          type="text" 
-          placeholder="Full Name" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-          className="w-full px-6 py-4 border rounded-3xl" 
-          required 
-        />
-        <input 
-          type="email" 
-          placeholder="Email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          className="w-full px-6 py-4 border rounded-3xl" 
-          required 
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          className="w-full px-6 py-4 border rounded-3xl" 
-          required 
-        />
-        {error && <p className="text-red-500 text-sm">{error}</p>}
-        <input 
-          type="text" 
-          placeholder="Photo URL (optional)" 
-          value={photoURL} 
-          onChange={(e) => setPhotoURL(e.target.value)} 
-          className="w-full px-6 py-4 border rounded-3xl" 
-        />
+          <div>
+            <label className="block text-sm font-medium mb-2">Email Address</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-blue-500"
+              required
+            />
+          </div>
 
-        <button 
-          type="submit" 
-          className="w-full bg-blue-600 text-white py-4 rounded-3xl text-xl font-semibold"
-        >
-          Register
-        </button>
-      </form>
+          <div>
+            <label className="block text-sm font-medium mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-blue-500"
+              required
+            />
+          </div>
 
-      <div className="my-6 text-center text-gray-500">OR</div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Profile Photo URL (optional)</label>
+            <input
+              type="text"
+              value={photoURL}
+              onChange={(e) => setPhotoURL(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-blue-500"
+              placeholder="https://i.ibb.co/your-photo.jpg"
+            />
+          </div>
 
-      <button
-        onClick={handleGoogleLogin}
-        className="w-full flex items-center justify-center gap-3 border border-gray-300 py-4 rounded-3xl hover:bg-gray-50 transition text-lg font-medium"
-      >
-        🔵 Continue with Google
-      </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-4 rounded-2xl font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+          >
+            {loading ? 'Creating account...' : 'Register'}
+          </button>
+        </form>
 
-      <p className="text-center mt-8">
-        Already have an account? <Link to="/login" className="text-blue-600 font-medium">Login</Link>
-      </p>
+        <p className="text-center mt-6 text-gray-600">
+          Already have an account?{' '}
+          <Link to="/login" className="text-blue-600 font-medium hover:underline">
+            Login here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

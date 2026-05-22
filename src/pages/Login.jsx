@@ -1,69 +1,67 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import toast from 'react-hot-toast';
+import { FcGoogle } from 'react-icons/fc';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
     const success = await login(email, password);
-    if (success) {
-      navigate('/');
-    }
-    setLoading(false);
+    if (success) navigate('/');
+  };
+
+  const handleGoogleLogin = async () => {
+    const success = await loginWithGoogle();
+    if (success) navigate('/');
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-8">
-        <h2 className="text-3xl font-bold text-center mb-8">Login to DocAppoint</h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium mb-2">Email Address</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-blue-500"
-              required
-            />
-          </div>
+    <div className="max-w-md mx-auto mt-20 bg-white p-10 rounded-3xl shadow">
+      <h2 className="text-4xl font-bold text-center mb-8">Login</h2>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:border-blue-500"
-              required
-            />
-          </div>
+      <form onSubmit={handleEmailLogin} className="space-y-6">
+        <input 
+          type="email" 
+          placeholder="Email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+          className="w-full px-6 py-4 border rounded-3xl" 
+          required 
+        />
+        <input 
+          type="password" 
+          placeholder="Password" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+          className="w-full px-6 py-4 border rounded-3xl" 
+          required 
+        />
+        <button 
+          type="submit" 
+          className="w-full bg-blue-600 text-white py-4 rounded-3xl text-xl font-semibold"
+        >
+          Login
+        </button>
+      </form>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-4 rounded-2xl font-semibold hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
+      <div className="my-6 text-center text-gray-500">OR</div>
 
-        <p className="text-center mt-6 text-gray-600">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-blue-600 font-medium hover:underline">
-            Register here
-          </Link>
-        </p>
-      </div>
+      <button
+        onClick={handleGoogleLogin}
+        className="w-full flex items-center justify-center gap-3 border border-gray-300 py-4 rounded-3xl hover:bg-gray-50 transition"
+      >
+        <FcGoogle size={24} />
+        <span className="font-medium">Continue with Google</span>
+      </button>
+
+      <p className="text-center mt-8">
+        Don't have an account? <Link to="/register" className="text-blue-600 font-medium">Register</Link>
+      </p>
     </div>
   );
 };

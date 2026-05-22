@@ -1,6 +1,6 @@
 # DocAppoint - Doctor Appointment Manager
 
-**Live Website:**    docappointclient.vercel.app
+**Live Website:**    [docappointclient.vercel.app](https://docappointclient.vercel.app/)
 
 A modern, full-stack Doctor Appointment Booking System built with **React + Vite + Tailwind CSS** (Frontend) and **Node.js + Express + MongoDB** (Backend).
 
